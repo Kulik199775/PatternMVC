@@ -78,6 +78,24 @@ class ShoeModel:
         """Получение обуви в диапазоне цен"""
         return [shoe for shoe in self.shoes if min_price <= shoe.price <= max_price]
 
+    def search_shoes(self, shoe_type=None, shoe_kind=None, min_price=None, max_price=None):
+        """Универсальный поиск обуви"""
+        result = self.shoes[:]
+
+        if shoe_type:
+            result = [shoe for shoe in result if shoe.shoe_type == shoe_type]
+
+        if shoe_kind:
+            result = [shoe for shoe in result if shoe.shoe_kind == shoe_kind]
+
+        if min_price is not None:
+            result = [shoe for shoe in result if shoe.price >= min_price]
+
+        if max_price is not None:
+            result = [shoe for shoe in result if shoe.price <= max_price]
+
+        return result
+
 
 # Контроллер
 class ShoeController:
@@ -115,22 +133,8 @@ class ShoeController:
         return 'Обувь не найдена'
 
     def search_shoes(self, shoe_type=None, shoe_kind=None, min_price=None, max_price=None):
-        """Поиск обуви"""
-        result = self.shoes[:]
-
-        if shoe_type:
-            result = [shoe for shoe in result if shoe.shoe_type == shoe_type]
-
-        if shoe_kind:
-            result = [shoe for shoe in result if shoe.shoe_kind == shoe_kind]
-
-        if min_price is not None:
-            result = [shoe for shoe in result if shoe.price >= min_price]
-
-        if max_price is not None:
-            result = [shoe for shoe in result if shoe.price <= max_price]
-
-        return result
+        """Поиск обуви по критериям"""
+        return self.model.search_shoes(shoe_type, shoe_kind, min_price, max_price)
 
 # Представление (View)
 
@@ -171,8 +175,46 @@ class ShoeView:
 
         manufacturer = input("Производитель: ")
 
-        shoe, message = self.controller.add_shoe(shoe_type, shoe_kind, color, price, manufacturer, size)
+        shoe, message = self.controller.create_shoe(shoe_type, shoe_kind, color, price, manufacturer, size)
         print(message)
+
+    def show_all_shoes(self):
+        """Показать всю обувь"""
+        shoes = self.controller.get_all_shoes()
+
+        if not shoes:
+            print("\nВ магазине нет обуви")
+            return
+
+        print("\n" + "=" * 40)
+        print("Вся обувь в магазине")
+        print("=" * 40)
+
+        for shoe in shoes:
+            print(f"id: {shoe.shoe_id} | {shoe}")
+
+        print("=" * 40)
+        print(f"Всего пар обуви: {len(shoes)}")
+        print("=" * 40)
+
+    def find_shoe(self):
+        """Найти обувь по id"""
+        try:
+            shoe_id = int(input("\nВведите id обуви: "))
+        except ValueError:
+            print("Ошибка: id должен быть числом")
+            return
+
+        shoe = self.controller.get_shoe(shoe_id)
+
+        if shoe:
+            print("\n" + "=" * 40)
+            print("НАЙДЕНА ОБУВЬ:")
+            print("=" * 40)
+            print(shoe)
+            print("=" * 40)
+        else:
+            print("\nОбувь с таким ID не найдена")
 
     def update_shoe(self):
         """Обновить данные обуви"""
@@ -276,9 +318,9 @@ class ShoeView:
 
     def run(self):
         """Запуск программы"""
-        self.controller.add_shoe("мужская", "кроссовки", "черный", 5000, "Nike", 42)
-        self.controller.add_shoe("женская", "туфли", "красный", 3000, "Geox", 37)
-        self.controller.add_shoe("мужская", "сапоги", "коричневый", 8000, "Timberland", 43)
+        self.controller.create_shoe("мужская", "кроссовки", "черный", 5000, "Nike", 42)
+        self.controller.create_shoe("женская", "туфли", "красный", 3000, "Geox", 37)
+        self.controller.create_shoe("мужская", "сапоги", "коричневый", 8000, "Timberland", 43)
 
         # Главный цикл
         while True:
