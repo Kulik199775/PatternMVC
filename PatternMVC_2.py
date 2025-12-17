@@ -208,3 +208,32 @@ class RecipeView:
         print("\n--- Все рецепты ---")
         for recipe in recipes:
             print(f"ID: {recipe.recipe_id} | {recipe}")
+
+    def find_recipe_by_id(self):
+        """Найти рецепт по id"""
+        try:
+            recipe_id = int(input("\nВведите id рецепта: "))
+        except ValueError:
+            print("Ошибка: id должен быть числом")
+            return
+
+        recipe = self.controller.get_recipe(recipe_id)
+
+        if recipe:
+            self.show_recipe_details(recipe)
+        else:
+            print("Рецепт не найден")
+
+    def show_recipe_details(self, recipe):
+        """Показать детальную информацию о рецепте"""
+        print(f"\n=== {recipe.name} ===")
+        print(f"Автор: {recipe.author}")
+        print(f"Тип: {recipe.recipe_type}")
+        print(f"Кухня: {recipe.cuisine}")
+        print(f"\nОписание: {recipe.description}")
+        print(f"\nИнгредиенты:")
+        for i, ingredient in enumerate(recipe.ingredients, 1):
+            print(f"  {i}. {ingredient}")
+        if recipe.video_link:
+            print(f"\nВидео: {recipe.video_link}")
+        print("=" * 40)
