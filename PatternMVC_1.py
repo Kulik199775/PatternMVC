@@ -77,3 +77,24 @@ class ShoeModel:
     def get_shoes_by_price_range(self, min_price, max_price):
         """Получение обуви в диапазоне цен"""
         return [shoe for shoe in self.shoes if min_price <= shoe.price <= max_price]
+
+
+# Контроллер
+class ShoeController:
+    def __init__(self):
+        self.model = ShoeModel()
+
+    def create_shoe(self, shoe_type, shoe_kind, color, price, manufacturer, size):
+        """Создать новую обувь"""
+        if price <= 0:
+            return None, 'Цена должна быть положительной'
+        if size <= 0:
+            return None, 'Размер должен быть положительным'
+
+        shoe = self.model.add_shoe(shoe_type, shoe_kind, color, price, manufacturer, size)
+        return shoe, 'Обувь успешно добавлена'
+
+    def get_all_shoes(self):
+        """Получение всей обуви"""
+        return self.model.get_all_shoes()
+
