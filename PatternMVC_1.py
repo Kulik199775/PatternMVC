@@ -98,3 +98,23 @@ class ShoeController:
         """Получение всей обуви"""
         return self.model.get_all_shoes()
 
+    def get_shoe(self, shoe_id):
+        """Получить обувь по ID"""
+        return self.model.get_shoe_by_id(shoe_id)
+
+    def update_shoe(self, shoe_id, **kwargs):
+        """Обновление данных обуви"""
+        if self.model.update_shoe(shoe_id, **kwargs)
+            return 'Данные обновлены!'
+        return 'Обувь не найдена'
+
+    def delete_shoe(self, shoe_id):
+        """Удалить обувь"""
+        if self.model.delete_shoe(shoe_id):
+            return 'Обувь удалена!'
+        return 'Обувь не найдена'
+
+    def search_shoes(self, shoe_type, shoe_kind, min_price, max_price):
+        """Поиск обуви"""
+        return self.model.search_shoes(shoe_type, shoe_kind, min_price, max_price)
+
