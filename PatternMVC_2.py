@@ -164,3 +164,47 @@ class RecipeView:
         print("5. Удалить рецепт")
         print("6. Поиск рецептов")
         print("7. Выход")
+
+    def add_recipe(self):
+        """Добавить новый рецепт"""
+        print("\n--- Добавление нового рецепта ---")
+
+        name = input("Название рецепта: ")
+        author = input("Автор рецепта: ")
+        recipe_type = input("Тип блюда (первое, второе, десерт и т.д.): ")
+        description = input("Описание рецепта: ")
+
+        print("\nДобавление ингредиентов (введите 'готово' для завершения):")
+        ingredients = []
+        while True:
+            ingredient = input("Ингредиент: ")
+            if ingredient.lower() == 'готово':
+                if not ingredients:
+                    print("Добавьте хотя бы один ингредиент")
+                    continue
+                break
+            ingredients.append(ingredient)
+
+        cuisine = input("Кухня (итальянская, французская и т.д.): ")
+        video_link = input("Ссылка на видео (необязательно): ")
+        if not video_link:
+            video_link = None
+
+        recipe, message = self.controller.create_recipe(
+            name, author, recipe_type, description, ingredients, cuisine, video_link
+        )
+        print(message)
+        if recipe:
+            print(f"id нового рецепта: {recipe.recipe_id}")
+
+    def show_all_recipes(self):
+        """Показать все рецепты"""
+        recipes = self.controller.get_all_recipes()
+
+        if not recipes:
+            print("\nНет доступных рецептов")
+            return
+
+        print("\n--- Все рецепты ---")
+        for recipe in recipes:
+            print(f"ID: {recipe.recipe_id} | {recipe}")
