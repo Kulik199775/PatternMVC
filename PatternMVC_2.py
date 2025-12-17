@@ -294,3 +294,130 @@ class RecipeView:
             print(message)
         else:
             print("Нечего обновлять")
+
+    def delete_recipe(self):
+        """Удалить рецепт"""
+        try:
+            recipe_id = int(input("\nВведите id рецепта для удаления: "))
+        except ValueError:
+            print("Ошибка: id должен быть числом")
+            return
+
+        message = self.controller.delete_recipe(recipe_id)
+        print(message)
+
+    def search_recipes(self):
+        """Поиск рецептов"""
+        print("\n--- Поиск рецептов ---")
+        print("1. По названию или описанию")
+        print("2. По типу блюда")
+        print("3. По кухне")
+        print("4. По ингредиенту")
+
+        try:
+            search_type = int(input("Выберите тип поиска: "))
+        except ValueError:
+            print("Ошибка: введите число от 1 до 4")
+            return
+
+        results = []
+
+        if search_type == 1:
+            search_term = input("Введите поисковый запрос: ")
+            results = self.controller.search_recipes(search_term=search_term)
+
+        elif search_type == 2:
+            recipe_type = input("Введите тип блюда: ")
+            results = self.controller.search_recipes(recipe_type=recipe_type)
+
+        elif search_type == 3:
+            cuisine = input("Введите кухню: ")
+            results = self.controller.search_recipes(cuisine=cuisine)
+
+        elif search_type == 4:
+            ingredient = input("Введите ингредиент: ")
+            results = self.controller.search_recipes(ingredient=ingredient)
+
+        else:
+            print("Неверный выбор")
+            return
+
+        if results:
+            print(f"\nНайдено {len(results)} рецептов:")
+            for recipe in results:
+                print(f"ID: {recipe.recipe_id} | {recipe}")
+
+            show_details = input("\nПоказать детали рецепта? (да/нет): ")
+            if show_details.lower() == 'да':
+                try:
+                    recipe_id = int(input("Введите ID рецепта: "))
+                    recipe = self.controller.get_recipe(recipe_id)
+                    if recipe and recipe in results:
+                        self.show_recipe_details(recipe)
+                    else:
+                        print("Рецепт не найден в результатах поиска")
+                except ValueError:
+                    print("Ошибка: введите число")
+        else:
+            print("Ничего не найдено")
+
+    def run(self):
+        """Запуск приложения"""
+        self.controller.create_recipe(
+            "Паста Карбонара",
+            "Мария",
+            "второе",
+            "Классическая итальянская паста с яйцом, сыром и беконом",
+            ["спагетти", "бекон", "яйца", "пармезан", "соль", "перец"],
+            "итальянская",
+            "https://youtube.com/карбонара"
+        )
+
+        self.controller.create_recipe(
+            "Борщ",
+            "Ольга",
+            "первое",
+            "Традиционный украинский суп со свеклой",
+            ["свекла", "капуста", "картофель", "мясо", "сметана"],
+            "украинская"
+        )
+
+        self.controller.create_recipe(
+            "Круассан",
+            "Пьер",
+            "десерт",
+            "Французская слоеная выпечка",
+            ["мука", "масло", "дрожжи", "сахар", "молоко"],
+            "французская"
+        )
+
+        while True:
+            self.show_menu()
+
+            try:
+                choice = int(input("\nВыберите действие: "))
+            except ValueError:
+                print("Ошибка: введите число от 1 до 7")
+                continue
+
+            if choice == 1:
+                self.add_recipe()
+            elif choice == 2:
+                self.show_all_recipes()
+            elif choice == 3:
+                self.find_recipe_by_id()
+            elif choice == 4:
+                self.update_recipe()
+            elif choice == 5:
+                self.delete_recipe()
+            elif choice == 6:
+                self.search_recipes()
+            elif choice == 7:
+                print("Выход из программы...")
+                break
+            else:
+                print("Неверный выбор. Попробуйте снова.")
+
+if __name__ == "__main__":
+    bookRecipe = RecipeView()
+    bookRecipe.run()
