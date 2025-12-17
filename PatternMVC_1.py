@@ -35,3 +35,4 @@ class ShoeModel:
         self.shoes.append(shoe)
         self.next_id += 1
         return shoe
+
