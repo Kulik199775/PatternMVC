@@ -36,3 +36,14 @@ class ShoeModel:
         self.next_id += 1
         return shoe
 
+    def get_all_shoes(self):
+        """Получение всей обуви"""
+        return self.shoes
+
+    def get_shoe_by_id(self, shoe_id):
+        """Найти обувь по id"""
+        for shoe in self.shoes:
+            if shoe.shoe_id == shoe_id:
+                return shoe
+        return None
+
