@@ -237,3 +237,60 @@ class RecipeView:
         if recipe.video_link:
             print(f"\nВидео: {recipe.video_link}")
         print("=" * 40)
+
+    def update_recipe(self):
+        """Обновить данные рецепта"""
+        try:
+            recipe_id = int(input("\nВведите ID рецепта для обновления: "))
+        except ValueError:
+            print("Ошибка: ID должен быть числом")
+            return
+
+        print("\n--- Обновление рецепта ---")
+        print("Оставьте поле пустым, если не хотите менять параметр")
+
+        updates = {}
+
+        name = input("Новое название: ")
+        if name:
+            updates['name'] = name
+
+        author = input("Новый автор: ")
+        if author:
+            updates['author'] = author
+
+        recipe_type = input("Новый тип: ")
+        if recipe_type:
+            updates['recipe_type'] = recipe_type
+
+        description = input("Новое описание: ")
+        if description:
+            updates['description'] = description
+
+        cuisine = input("Новая кухня: ")
+        if cuisine:
+            updates['cuisine'] = cuisine
+
+        video_link = input("Новая ссылка на видео: ")
+        if video_link:
+            updates['video_link'] = video_link
+
+        print("\nОбновить ингредиенты? (да/нет): ")
+        if input().lower() == 'да':
+            print("Введите новые ингредиенты (введите 'готово' для завершения):")
+            ingredients = []
+            while True:
+                ingredient = input("Ингредиент: ")
+                if ingredient.lower() == 'готово':
+                    if not ingredients:
+                        print("Добавьте хотя бы один ингредиент")
+                        continue
+                    break
+                ingredients.append(ingredient)
+            updates['ingredients'] = ingredients
+
+        if updates:
+            message = self.controller.update_recipe(recipe_id, **updates)
+            print(message)
+        else:
+            print("Нечего обновлять")
