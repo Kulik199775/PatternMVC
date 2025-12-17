@@ -94,3 +94,19 @@ class RecipeModel:
                     search_term in recipe.description.lower()):
                 result.append(recipe)
         return result
+
+
+class RecipeController:
+    def __init__(self):
+        self.model = RecipeModel()
+
+    def create_recipe(self, name, author, recipe_type, description, ingredients, cuisine, video_link=None):
+        """Создать новый рецепт"""
+        if not name or not description:
+            return None, "Название и описание обязательны"
+
+        if not ingredients:
+            return None, "Добавьте хотя бы один ингредиент"
+
+        recipe = self.model.add_recipe(name, author, recipe_type, description, ingredients, cuisine, video_link)
+        return recipe, "Рецепт успешно добавлен"
