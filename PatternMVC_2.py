@@ -68,3 +68,11 @@ class RecipeModel:
             self.recipes.remove(recipe)
             return True
         return False
+
+    def get_recipes_by_type(self, recipe_type):
+        """Получить рецепты по типу (первое, второе и т.д.)"""
+        return [recipe for recipe in self.recipes if recipe.recipe_type == recipe_type]
+
+    def get_recipes_by_cuisine(self, cuisine):
+        """Получить рецепты по кухне"""
+        return [recipe for recipe in self.recipes if recipe.cuisine == cuisine]
