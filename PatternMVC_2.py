@@ -76,3 +76,21 @@ class RecipeModel:
     def get_recipes_by_cuisine(self, cuisine):
         """Получить рецепты по кухне"""
         return [recipe for recipe in self.recipes if recipe.cuisine == cuisine]
+
+    def get_recipes_by_ingredient(self, ingredient):
+        """Найти рецепты по ингредиенту"""
+        result = []
+        for recipe in self.recipes:
+            if any(ingredient.lower() in ing.lower() for ing in recipe.ingredients):
+                result.append(recipe)
+        return result
+
+    def search_recipes(self, search_term):
+        """Поиск рецептов по названию или описанию"""
+        search_term = search_term.lower()
+        result = []
+        for recipe in self.recipes:
+            if (search_term in recipe.name.lower() or
+                    search_term in recipe.description.lower()):
+                result.append(recipe)
+        return result
