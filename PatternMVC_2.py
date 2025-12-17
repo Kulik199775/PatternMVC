@@ -25,3 +25,16 @@ class Recipe:
     def __str__(self):
         ingredients_str = ', '.join(self.ingredients[:3]) + ("..." if len(self.ingredients) > 3 else "")
         return f"{self.name} ({self.recipe_type}) - {self.cuisine} кухня"
+
+
+class RecipeModel:
+    def __init__(self):
+        self.recipes = []
+        self.next_id = 1
+
+    def add_recipe(self, name, author, recipe_type, description, ingredients, cuisine, video_link=None):
+        """Добавить новый рецепт"""
+        recipe = Recipe(self.next_id, name, author, recipe_type, description, ingredients, cuisine, video_link)
+        self.recipes.append(recipe)
+        self.next_id += 1
+        return recipe
