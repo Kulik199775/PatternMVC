@@ -104,7 +104,7 @@ class ShoeController:
 
     def update_shoe(self, shoe_id, **kwargs):
         """Обновление данных обуви"""
-        if self.model.update_shoe(shoe_id, **kwargs)
+        if self.model.update_shoe(shoe_id, **kwargs):
             return 'Данные обновлены!'
         return 'Обувь не найдена'
 
@@ -114,9 +114,23 @@ class ShoeController:
             return 'Обувь удалена!'
         return 'Обувь не найдена'
 
-    def search_shoes(self, shoe_type, shoe_kind, min_price, max_price):
+    def search_shoes(self, shoe_type=None, shoe_kind=None, min_price=None, max_price=None):
         """Поиск обуви"""
-        return self.model.search_shoes(shoe_type, shoe_kind, min_price, max_price)
+        result = self.shoes[:]
+
+        if shoe_type:
+            result = [shoe for shoe in result if shoe.shoe_type == shoe_type]
+
+        if shoe_kind:
+            result = [shoe for shoe in result if shoe.shoe_kind == shoe_kind]
+
+        if min_price is not None:
+            result = [shoe for shoe in result if shoe.price >= min_price]
+
+        if max_price is not None:
+            result = [shoe for shoe in result if shoe.price <= max_price]
+
+        return result
 
 # Представление (View)
 
@@ -141,96 +155,70 @@ class ShoeView:
 
     def add_shoe(self):
         """Добавить новую обувь"""
-        print('\n ---Добавить обувь---')
+        print("\n--- Добавить обувь ---")
 
-        shoe_type = input('Тип (мужская/женская): ')
-        shoe_kind = input('Вид (кроссовки, сапоги и т.п.): ')
-        color = input('Цвет: ')
+        # Исправленные имена
+        shoe_type = input("Тип (мужская/женская): ")
+        shoe_kind = input("Вид (кроссовки, сапоги и т.д.): ")
+        color = input("Цвет: ")
 
         try:
-            price = float(input('Цена: '))
-            size = float(input('Размер: '))
+            price = float(input("Цена: "))
+            size = float(input("Размер: "))
         except:
-            print('Ошибка: цена и размер должны быть положительными!')
+            print("Ошибка: цена и размер должны быть числами")
             return
 
-        manufacturer = input('Производитель: ')
+        manufacturer = input("Производитель: ")
 
         shoe, message = self.controller.add_shoe(shoe_type, shoe_kind, color, price, manufacturer, size)
         print(message)
 
-    def show_all_shoes(self):
-        """Показать всю обувь"""
-        shoes = self.controller.get_all_shoes()
-
-        if not shoes:
-            print('\nОбуви нет в магазине')
-            return
-
-        print('\n---Вся обувь---')
-        for shoe in shoes:
-            print(shoe)
-        print(f'Всего: {len(shoes)} пар')
-
-    def find_shoe(self):
-        """Найти обувь по id"""
-        try:
-            shoe_id = int(input('\nВведите id обуви: '))
-        except:
-            print('Ошибка: id должен быть числом')
-            return
-
-        shoe = self.controller.get_shoe(shoe_id)
-
-        if shoe:
-            print(f'\nНайдена: {shoe}')
-        else:
-            print('Обувь не найдена')
-
     def update_shoe(self):
         """Обновить данные обуви"""
         try:
-            shoe_id = int(input('\nВведите id обуви для обновления: '))
+            id = int(input("\nВведите ID обуви для обновления: "))
         except:
-            print('Ошибка! ID должен быть числом.')
+            print("Ошибка: ID должен быть числом")
             return
 
-        print('Введите новые данные (если не менять, оставьте пустым): ')
+        print("Введите новые данные (оставьте пустым, если не менять):")
+
         updates = {}
 
-        shoe_type = input('Новый тип: ')
+        shoe_type = input("Новый тип: ")
         if shoe_type:
-            updates['shoe_type'] = shoe_type
+            updates['shoe_type'] = shoe_type  # ← должно быть 'shoe_type', а не 'type'
 
-        shoe_kind = input('Новый вид: ')
+        shoe_kind = input("Новый вид: ")
         if shoe_kind:
             updates['shoe_kind'] = shoe_kind
 
-        color = input('Новый цвет: ')
+        color = input("Новый цвет: ")
         if color:
             updates['color'] = color
 
-        price = input('Новая цена: ')
+        price = input("Новая цена: ")
         if price:
             try:
                 updates['price'] = float(price)
             except:
-                print(f'Ошибка: цена должна быть числом.')
+                print("Ошибка: цена должна быть числом")
                 return
 
-        manufacturer = input('Новый производитель: ')
+        manufacturer = input("Новый производитель: ")
         if manufacturer:
             updates['manufacturer'] = manufacturer
 
-        size = input('Новый размер: ')
+        size = input("Новый размер: ")
         if size:
             try:
                 updates['size'] = float(size)
             except:
-                print('Ошибка: размер должен быть числом')
+                print("Ошибка: размер должен быть числом")
                 return
 
-        message = self.controller.update_shoe(shoe_id, **updates)
+        message = self.controller.update_shoe(id, **updates)
         print(message)
 
     def delete_shoe(self):
@@ -246,14 +234,14 @@ class ShoeView:
 
     def search_shoes(self):
         """Поиск обуви"""
-        print('\n---Поиск обуви---')
-        print('Оставьте пустым, если не важно')
+        print("\n--- Поиск обуви ---")
+        print("Оставьте пустым, если не важно")
 
-        shoe_type = input('Тип (муж/жен): ')
+        shoe_type = input("Тип (мужская/женская): ")
         if not shoe_type:
             shoe_type = None
 
-        shoe_kind = input("Вид: ")
+        shoe_kind = input("Вид (кроссовки, сапоги и т.д.): ")
         if not shoe_kind:
             shoe_kind = None
 
@@ -288,7 +276,6 @@ class ShoeView:
 
     def run(self):
         """Запуск программы"""
-        # Добавим тестовые данные
         self.controller.add_shoe("мужская", "кроссовки", "черный", 5000, "Nike", 42)
         self.controller.add_shoe("женская", "туфли", "красный", 3000, "Geox", 37)
         self.controller.add_shoe("мужская", "сапоги", "коричневый", 8000, "Timberland", 43)
