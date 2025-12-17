@@ -38,3 +38,14 @@ class RecipeModel:
         self.recipes.append(recipe)
         self.next_id += 1
         return recipe
+
+    def get_all_recipes(self):
+        """Получить все рецепты"""
+        return self.recipes
+
+    def get_recipe_by_id(self, recipe_id):
+        """Найти рецепт по id"""
+        for recipe in self.recipes:
+            if recipe.recipe_id == recipe_id:
+                return recipe
+        return None
