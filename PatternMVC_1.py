@@ -47,3 +47,21 @@ class ShoeModel:
                 return shoe
         return None
 
+    def update_shoe(self, shoe_id, **kwargs):
+        """Обновление данных обуви"""
+        shoe = self.get_shoe_by_id(shoe_id)
+        if not shoe:
+            return False
+
+        for key, value in kwargs.items():
+            if hasattr(shoe, key):
+                setattr(shoe, key, value)
+        return True
+
+    def delete_shoe(self, shoe_id):
+        """Удаление обуви"""
+        shoe = self.get_shoe_by_id(shoe_id)
+        if shoe:
+            self.shoes.remove(shoe)
+            return True
+        return False
