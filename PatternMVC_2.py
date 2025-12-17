@@ -148,3 +148,19 @@ class RecipeController:
             results = self.model.get_recipes_by_ingredient(ingredient)
 
         return results
+
+
+class RecipeView:
+    def __init__(self):
+        self.controller = RecipeController()
+
+    def show_menu(self):
+        """Показать меню"""
+        print("\n---Книга рецептов---")
+        print("1. Добавить рецепт")
+        print("2. Показать все рецепты")
+        print("3. Найти рецепт по ID")
+        print("4. Обновить рецепт")
+        print("5. Удалить рецепт")
+        print("6. Поиск рецептов")
+        print("7. Выход")
