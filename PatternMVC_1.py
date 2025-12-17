@@ -65,3 +65,15 @@ class ShoeModel:
             self.shoes.remove(shoe)
             return True
         return False
+
+    def get_shoes_by_type(self, shoe_type):
+        """Получить обувь по типу (муж/жен)"""
+        return [shoe for shoe in self.shoes if shoe.shoe_type == shoe_type]
+
+    def get_shoes_by_kind(self, shoe_kind):
+        """Получить обувь по виду (кроссовки, сапоги и т.д)"""
+        return [shoe for shoe in self.shoes if shoe.shoe_kind == shoe_kind]
+
+    def get_shoes_by_price_range(self, min_price, max_price):
+        """Получение обуви в диапазоне цен"""
+        return [shoe for shoe in self.shoes if min_price <= shoe.price <= max_price]
