@@ -49,3 +49,22 @@ class RecipeModel:
             if recipe.recipe_id == recipe_id:
                 return recipe
         return None
+
+    def update_recipe(self, recipe_id, **kwargs):
+        """Обновить данные рецепта"""
+        recipe = self.get_recipe_by_id(recipe_id)
+        if not recipe:
+            return False
+
+        for key, value in kwargs.items():
+            if hasattr(recipe, key):
+                setattr(recipe, key, value)
+        return True
+
+    def delete_recipe(self, recipe_id):
+        """Удалить рецепт"""
+        recipe = self.get_recipe_by_id(recipe_id)
+        if recipe:
+            self.recipes.remove(recipe)
+            return True
+        return False
