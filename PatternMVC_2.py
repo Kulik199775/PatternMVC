@@ -110,3 +110,41 @@ class RecipeController:
 
         recipe = self.model.add_recipe(name, author, recipe_type, description, ingredients, cuisine, video_link)
         return recipe, "Рецепт успешно добавлен"
+
+    def get_all_recipes(self):
+        """Получить все рецепты"""
+        return self.model.get_all_recipes()
+
+    def get_recipe(self, recipe_id):
+        """Получить рецепт по id"""
+        return self.model.get_recipe_by_id(recipe_id)
+
+    def update_recipe(self, recipe_id, **kwargs):
+        """Обновить данные рецепта"""
+        if self.model.update_recipe(recipe_id, **kwargs):
+            return "Рецепт обновлен успешно"
+        return "Рецепт не найден"
+
+    def delete_recipe(self, recipe_id):
+        """Удалить рецепт"""
+        if self.model.delete_recipe(recipe_id):
+            return "Рецепт удален успешно"
+        return "Рецепт не найден"
+
+    def search_recipes(self, search_term=None, recipe_type=None, cuisine=None, ingredient=None):
+        """Поиск рецептов по различным критериям"""
+        results = self.model.get_all_recipes()
+
+        if search_term:
+            results = self.model.search_recipes(search_term)
+
+        if recipe_type:
+            results = [recipe for recipe in results if recipe.recipe_type == recipe_type]
+
+        if cuisine:
+            results = [recipe for recipe in results if recipe.cuisine == cuisine]
+
+        if ingredient:
+            results = self.model.get_recipes_by_ingredient(ingredient)
+
+        return results
