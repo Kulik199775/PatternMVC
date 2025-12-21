@@ -26,3 +26,23 @@ class DiscountPriceStrategy(PriceStrategy):
 
     def __init__(self, discount_percent: float):
         self.discount = discount_percent / 100
+
+    def calculate_price(self, base_price: float):
+        """Расчет цены со скидкой"""
+        return base_price * (1 - self.discount)
+
+class OrderObserver(ABC):
+    """Абстрактный класс - наблюдение за заказами"""
+
+    @abstractmethod
+    def update(self, order: 'Order'):
+        """Метод, вызываемый при изменении состояния заказа"""
+        pass
+
+class OrderLogger(OrderObserver):
+    """Класс для логирования создания заказов"""
+
+    def update(self, order: 'Order'):
+        """Логирует информация о созданном заказе"""
+        print(f'Заказ #{order.order_id} создан: {order.pizza.name}')
+
