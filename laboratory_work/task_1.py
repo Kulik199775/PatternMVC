@@ -239,5 +239,35 @@ class Order:
         with open(filename, 'w', encoding='utf-8') as f:
             json.dump(orders, f, ensure_ascii=False, indent=2)
 
+class OrderManager:
+    """Управление заказами"""
 
+    def __init__(self):
+        self.orders: List[Order] = []
+        self.statistics = StatisticsTracker()
+
+    def create_order(self, pizza: Pizza, price_strategy: PriceStrategy = None):
+        """Создание и регистрация заказа в системе"""
+
+        order = Order(pizza, price_strategy)
+        order.add_observer(self.statistics)
+        order.add_observer(OrderLogger())
+        order.notify_observer()
+        order.save_to_file()
+        self.orders.append(order)
+        return order
+
+    def get_total_statistics(self):
+        """Общая статистика по всем заказам"""
+
+        total_revenue = sum(o.total_price for o in self.orders)
+        total_cost = sum(o.total_cost for o in self.orders)
+        total_profit = total_revenue - total_cost
+
+        return {
+            'total_orders': len(self.orders),
+            'total_revenue': total_revenue,
+            'total_cost': total_cost,
+            'total_profit': total_profit
+        }
 
