@@ -180,8 +180,64 @@ class PizzaFactory:
         if name in cls._recipes:
             del cls._recipes[name]
 
+class Order:
+    """Класс, представляющий заказ на пиццу"""
 
+    _next_id = 1
+    def __init__(self, pizza: Pizza, price_strategy: PriceStrategy = None):
+        self.order_id = Order._next_id
+        Order._next_id += 1
+        self.pizza = pizza
+        self.price_strategy = price_strategy or StandardPriceStrategy()
+        self.order_date = datetime.datetime.now()
+        self._observers: List[OrderObserver] = []
 
+    @property
+    def total_price(self):
+        """Расчет общей стоимости заказа"""
+        return self.pizza.get_total_price(self.price_strategy)
+
+    @property
+    def total_cost(self):
+        """Расчет общей себестоимости заказа"""
+        return self.pizza.get_total_cost()
+
+    @property
+    def profit(self):
+        """Расчет прибыли от заказа"""
+        return self.total_price - self.total_cost
+
+    def add_observer(self, observer: OrderObserver):
+        """Добавление наблюдения к заказу"""
+        self._observers.append(observer)
+
+    def notify_observer(self):
+        """Уведомляет о создании заказа"""
+        for observer in self._observers:
+            observer.update(self)
+
+    def save_to_file(self, filename: str = 'order.json'):
+        """Сохранение информации о заказе в JSON файл"""
+
+        order_data = {
+            'order_id': self.order_id,
+            'pizza_name': self.pizza.name,
+            'total_price': self.total_price,
+            'total_cost': self.total_cost,
+            'profit': self.profit,
+            'order_date': self.order_date.isoformat(),
+            'toppings': [t.name for t in self.pizza.all_toppings]
+        }
+
+        orders = []
+        if os.path.exists(filename):
+            with open(filename, 'r', encoding='utf-8') as f:
+                orders = json.load(f)
+
+        orders.append(order_data)
+
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(orders, f, ensure_ascii=False, indent=2)
 
 
 
