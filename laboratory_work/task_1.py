@@ -139,6 +139,47 @@ class PizzaFactory:
                     )
                     cls._recipes[recipe.name] = recipe
 
+    @classmethod
+    def save_recipes(cls, filename: str = 'recipes.json'):
+        """Сохранение рецептов в JSON файл"""
+
+        data = []
+        for recipe in cls._recipes.values():
+            recipe_data = asdict(recipe)
+            recipe_data['toppings'] = [asdict(t) for t in recipe.toppings]
+            data.append(recipe_data)
+
+        with open(filename, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+    @classmethod
+    def get_recipe(cls, name: str):
+        """Возврат рецепта по имени"""
+
+        return cls._recipes.get(name)
+
+    @classmethod
+    def get_all_recipes(cls):
+        """Список всех доступных рецептов"""
+
+        return list(cls._recipes.values())
+
+    @classmethod
+    def create_custom_recipe(cls, name: str, base_price: float, base_cost: float,
+                             toppings: List[Topping], description: str = ""):
+        """Создание и сохранение нового пользовательского рецепта"""
+
+        recipe = PizzaRecipe(name, base_price, base_cost, toppings, description)
+        cls._recipes[name] = recipe
+        return recipe
+
+    @classmethod
+    def delete_recipe(cls, name: str):
+        """Удаление рецепта по имени"""
+
+        if name in cls._recipes:
+            del cls._recipes[name]
+
 
 
 
