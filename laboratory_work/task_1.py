@@ -57,5 +57,32 @@ class StatisticsTracker(OrderObserver):
         self.total_orders += 1
         self.total_revenue += order.total_price
 
+@dataclass
+class Topping:
+    """Класс для представления ингредиентов пиццы"""
+
+    name: str
+    price: float
+    cost: float
+
+@dataclass
+class PizzaRecipe:
+    """Класс для представления рецепта пиццы"""
+
+    name: str
+    base_price: float
+    base_cost: float
+    toppings: List[Topping]
+    description: str = ""
+
+class Pizza:
+    """Класс для представления приготовленной пиццы по рецепту"""
+
+    def __init__(self, recipe: PizzaRecipe, custom_toppings: List[Topping] = None):
+        self.recipe = recipe
+        self.custom_toppings = custom_toppings or []
+
+
+
 
 
