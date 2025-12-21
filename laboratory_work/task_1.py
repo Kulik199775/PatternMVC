@@ -82,6 +82,42 @@ class Pizza:
         self.recipe = recipe
         self.custom_toppings = custom_toppings or []
 
+    @property
+    def name(self):
+        """Название пиццы"""
+        return self.recipe.name
+
+    @property
+    def all_toppings(self):
+        """Все начинки для пиццы"""
+        return self.recipe.toppings + self.custom_toppings
+
+    @property
+    def base_price(self):
+        """Базовая пицца из рецепта"""
+        return self.recipe.base_price
+
+    @property
+    def base_cost(self):
+        """Базовая себестоимость пиццы из рецепта"""
+        return self.recipe.base_cost
+
+    def get_total_cost(self):
+        """Полная себестоимость пиццы"""
+        toppings_cost = sum(t.cost for t in self.all_toppings)
+        return self.base_cost + toppings_cost
+
+    def get_total_price(self, strategy: PriceStrategy = None):
+        """Полная цена пиццы с учетом ценообразования"""
+
+        if strategy is None:
+            strategy = StandardPriceStrategy()
+
+        toppings_price = sum(t.price for t in self.all_toppings)
+        base_price = self.base_price + toppings_price
+        return strategy.calculate_price(base_price)
+
+
 
 
 
