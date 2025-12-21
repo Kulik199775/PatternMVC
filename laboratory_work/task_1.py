@@ -117,6 +117,28 @@ class Pizza:
         base_price = self.base_price + toppings_price
         return strategy.calculate_price(base_price)
 
+class PizzaFactory:
+    """Паттерн фабрика - для создания пицц"""
+    _recipes: Dict[str, PizzaRecipe] = {}
+
+    @classmethod
+    def load_recipes(cls, filename: str = 'recipes.json'):
+        """Загрузка рецептов из JSON файла"""
+
+        if os.path.exists(filename):
+            with open(filename, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                for recipe_data in data:
+                    toppings = [Topping(**t) for t in recipe_data['toppings']]
+                    recipe = PizzaRecipe(
+                        name=recipe_data['name'],
+                        base_price=recipe_data['base_price'],
+                        base_cost=recipe_data['base_cost'],
+                        toppings=toppings,
+                        description=recipe_data.get('description', '')
+                    )
+                    cls._recipes[recipe.name] = recipe
+
 
 
 
