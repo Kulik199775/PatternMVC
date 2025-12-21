@@ -271,3 +271,315 @@ class OrderManager:
             'total_profit': total_profit
         }
 
+
+class UserInterface:
+    """Основной пользовательский интерфейс приложения"""
+
+    def __init__(self):
+        """Инициализирует пользовательский интерфейс"""
+
+        self.order_manager = OrderManager()
+        self.available_toppings = [
+            Topping("Сыр", 50, 20),
+            Topping("Ветчина", 70, 30),
+            Topping("Грибы", 40, 15),
+            Topping("Пепперони", 60, 25),
+            Topping("Оливки", 30, 10),
+            Topping("Помидоры", 25, 8),
+            Topping("Лук", 20, 5),
+            Topping("Перец", 30, 12)
+        ]
+
+        self._load_standard_recipes()
+
+    def _load_standard_recipes(self):
+        """Загружает стандартные рецепты пицц в фабрику"""
+        standard_recipes = [
+            PizzaRecipe(
+                name="Маргарита",
+                base_price=300,
+                base_cost=100,
+                toppings=[self.available_toppings[0]],  # Сыр
+                description="Классическая пицца с томатным соусом и сыром"
+            ),
+            PizzaRecipe(
+                name="Пепперони",
+                base_price=400,
+                base_cost=150,
+                toppings=[self.available_toppings[0], self.available_toppings[3]],
+                description="Острая пицца с пепперони и сыром"
+            ),
+            PizzaRecipe(
+                name="Гавайская",
+                base_price=450,
+                base_cost=160,
+                toppings=[self.available_toppings[0], self.available_toppings[1]],
+                description="С ветчиной и ананасами"
+            ),
+            PizzaRecipe(
+                name="Четыре сыра",
+                base_price=500,
+                base_cost=180,
+                toppings=[self.available_toppings[0]],
+                description="Смесь четырех разных сыров"
+            ),
+            PizzaRecipe(
+                name="Вегетарианская",
+                base_price=350,
+                base_cost=120,
+                toppings=[self.available_toppings[2], self.available_toppings[5], self.available_toppings[6]],
+                description="Свежие овощи на тонком тесте"
+            )
+        ]
+
+        for recipe in standard_recipes:
+            PizzaFactory._recipes[recipe.name] = recipe
+
+    def show_main_menu(self):
+        """Отображает главное меню приложения и обрабатывает выбор пользователя"""
+        while True:
+            print("\nДобро пожаловать в пиццерию!")
+            print("1. Сделать заказ")
+            print("2. Просмотреть статистику")
+            print("3. Админ-панель")
+            print("4. Выйти")
+
+            choice = input("Выберите действие: ")
+
+            if choice == "1":
+                self.make_order()
+            elif choice == "2":
+                self.show_statistics()
+            elif choice == "3":
+                self.admin_panel()
+            elif choice == "4":
+                print("До свидания!")
+                break
+            else:
+                print("Неверный выбор!")
+
+    def make_order(self):
+        """Процесс создания нового заказа"""
+        print("\nСоздание заказа")
+
+        recipes = PizzaFactory.get_all_recipes()
+        print("\nДоступные рецепты:")
+        for i, recipe in enumerate(recipes, 1):
+            print(f"{i}. {recipe.name} - {recipe.base_price} руб. ({recipe.description})")
+        print(f"{len(recipes) + 1}. Создать свой рецепт")
+
+        try:
+            choice = int(input("Выберите рецепт: ")) - 1
+        except ValueError:
+            print("Неверный ввод!")
+            return
+
+        if choice == len(recipes):
+            pizza = self.create_custom_pizza()
+        elif 0 <= choice < len(recipes):
+            pizza = Pizza(recipes[choice])
+        else:
+            print("Неверный выбор!")
+            return
+
+        print("\nХотите добавить дополнительные начинки?")
+        print("1. Да")
+        print("2. Нет")
+
+        if input("Ваш выбор: ") == "1":
+            self.add_toppings(pizza)
+
+        print("\nВыберите тип цены:")
+        print("1. Стандартная цена")
+        print("2. Со скидкой 10%")
+
+        price_choice = input("Ваш выбор: ")
+
+        if price_choice == "2":
+            strategy = DiscountPriceStrategy(10)
+        else:
+            strategy = StandardPriceStrategy()
+
+        order = self.order_manager.create_order(pizza, strategy)
+
+        print("\nЗаказ создан!")
+        print(f"Номер заказа: #{order.order_id}")
+        print(f"Пицца: {pizza.name}")
+        print(f"Начинки: {', '.join(t.name for t in pizza.all_toppings) if pizza.all_toppings else 'нет'}")
+        print(f"Стоимость: {order.total_price:.2f} руб.")
+        print(f"Прибыль: {order.profit:.2f} руб.")
+
+    def create_custom_pizza(self) -> Pizza:
+        """Создает пользовательскую пиццу по индивидуальному рецепту"""
+
+        print("\nСоздание своего рецепта")
+        name = input("Введите название пиццы: ")
+
+        try:
+            base_price = float(input("Введите базовую цену: "))
+            base_cost = float(input("Введите себестоимость: "))
+        except ValueError:
+            print("Неверный формат числа!")
+            return self.create_custom_pizza()
+
+        description = input("Введите описание: ")
+
+        print("\nВыберите начинки:")
+        for i, topping in enumerate(self.available_toppings, 1):
+            print(f"{i}. {topping.name} - {topping.price} руб.")
+
+        choices = input("Введите номера начинок через запятую: ")
+        selected_indices = [int(x.strip()) - 1 for x in choices.split(",") if x.strip().isdigit()]
+
+        toppings = [self.available_toppings[i] for i in selected_indices
+                    if 0 <= i < len(self.available_toppings)]
+
+        recipe = PizzaFactory.create_custom_recipe(name, base_price, base_cost, toppings, description)
+        return Pizza(recipe)
+
+    def add_toppings(self, pizza: Pizza):
+        """Добавляет дополнительные начинки к пицце"""
+
+        print("\nДобавление начинко:")
+        for i, topping in enumerate(self.available_toppings, 1):
+            print(f"{i}. {topping.name} - {topping.price} руб.")
+
+        print("0. Завершить добавление")
+
+        while True:
+            try:
+                choice = int(input("Выберите начинку (0 для завершения): "))
+            except ValueError:
+                print("Неверный ввод!")
+                continue
+
+            if choice == 0:
+                break
+            elif 1 <= choice <= len(self.available_toppings):
+                pizza.custom_toppings.append(self.available_toppings[choice - 1])
+                print(f"Добавлен: {self.available_toppings[choice - 1].name}")
+            else:
+                print("Неверный выбор!")
+
+    def show_statistics(self):
+        """Отображает общую статистику пиццерии"""
+        stats = self.order_manager.get_total_statistics()
+        print("\nСтатистика пиццерии:")
+        print(f"Всего заказов: {stats['total_orders']}")
+        print(f"Общая выручка: {stats['total_revenue']:.2f} руб.")
+        print(f"Общая себестоимость: {stats['total_cost']:.2f} руб.")
+        print(f"Общая прибыль: {stats['total_profit']:.2f} руб.")
+
+    def admin_panel(self):
+        """Панель администратора для управления рецептами"""
+
+        print("\nАдмин-панель")
+        password = input("Введите пароль (admin): ")
+
+        if password != "admin":
+            print("Неверный пароль!")
+            return
+
+        while True:
+            print("\nМеню админа:")
+            print("1. Просмотреть все рецепты")
+            print("2. Добавить рецепт")
+            print("3. Удалить рецепт")
+            print("4. Сохранить рецепты в файл")
+            print("5. Загрузить рецепты из файла")
+            print("6. Назад")
+
+            choice = input("Выберите действие: ")
+
+            if choice == "1":
+                self.view_all_recipes()
+            elif choice == "2":
+                self.add_recipe_admin()
+            elif choice == "3":
+                self.delete_recipe_admin()
+            elif choice == "4":
+                PizzaFactory.save_recipes()
+                print("Рецепты сохранены!")
+            elif choice == "5":
+                PizzaFactory.load_recipes()
+                print("Рецепты загружены!")
+            elif choice == "6":
+                break
+            else:
+                print("Неверный выбор!")
+
+    def view_all_recipes(self):
+        """Отображает все доступные рецепты пицц"""
+
+        recipes = PizzaFactory.get_all_recipes()
+        print("\nВсе рецепты:")
+        for recipe in recipes:
+            print(f"\n{recipe.name}:")
+            print(f"  Цена: {recipe.base_price} руб.")
+            print(f"  Себестоимость: {recipe.base_cost} руб.")
+            print(f"  Описание: {recipe.description}")
+            if recipe.toppings:
+                print(f"  Начинки: {', '.join(t.name for t in recipe.toppings)}")
+
+    def add_recipe_admin(self):
+        """Добавляет новый рецепт через админ-панель"""
+
+        print("\nДобавление нового рецепта")
+        name = input("Название: ")
+
+        try:
+            base_price = float(input("Базовая цена: "))
+            base_cost = float(input("Себестоимость: "))
+        except ValueError:
+            print("Неверный формат числа!")
+            return
+
+        description = input("Описание: ")
+
+        toppings = []
+        print("\nДоступные начинки:")
+        for i, topping in enumerate(self.available_toppings, 1):
+            print(f"{i}. {topping.name}")
+
+        choice = input("Введите номера начинок через запятую: ")
+        selected_indices = [int(x.strip()) - 1 for x in choice.split(",") if x.strip().isdigit()]
+
+        for idx in selected_indices:
+            if 0 <= idx < len(self.available_toppings):
+                toppings.append(self.available_toppings[idx])
+
+        PizzaFactory.create_custom_recipe(name, base_price, base_cost, toppings, description)
+        print(f"Рецепт '{name}' добавлен!")
+
+    def delete_recipe_admin(self):
+        """Удаляет рецепт через админ-панель"""
+
+        recipes = PizzaFactory.get_all_recipes()
+        print("\nУдаление рецепта")
+
+        for i, recipe in enumerate(recipes, 1):
+            print(f"{i}. {recipe.name}")
+
+        try:
+            choice = int(input("Выберите рецепт для удаления: ")) - 1
+        except ValueError:
+            print("Неверный ввод!")
+            return
+
+        if 0 <= choice < len(recipes):
+            name = recipes[choice].name
+            PizzaFactory.delete_recipe(name)
+            print(f"Рецепт '{name}' удален!")
+        else:
+            print("Неверный выбор!")
+
+
+if __name__ == '__main__':
+    PizzaFactory.load_recipes()
+
+    ui = UserInterface()
+    ui.show_main_menu()
+
+    PizzaFactory.save_recipes()
+
+
