@@ -46,3 +46,16 @@ class OrderLogger(OrderObserver):
         """Логирует информация о созданном заказе"""
         print(f'Заказ #{order.order_id} создан: {order.pizza.name}')
 
+class StatisticsTracker(OrderObserver):
+    """Класс для отслеживания статистики продаж"""
+
+    def __init__(self):
+        self.total_orders = 0
+        self.total_revenue = 0.0
+
+    def update(self, order: 'Order'):
+        self.total_orders += 1
+        self.total_revenue += order.total_price
+
+
+
