@@ -68,3 +68,46 @@ class Film:
                 f"Длительность: {self.duration} мин.\n"
                 f"Студия: {self.studio}\n"
                 f"Актеры:\n{actors_str}")
+
+# Контроллер
+class FilmController:
+    """Контроллер для управления фильмами."""
+
+    def __init__(self, model: Film, view):
+        self.model = model
+        self.view = view
+
+    def create_film(self, title: str, genre: str, director: str,
+                    year: int, duration: int, studio: str, actors: list = None):
+        """Создает новый фильм"""
+
+        self.model = Film(title, genre, director, year, duration, studio, actors)
+        self.view.show_message(f"Фильм '{title}' создан!")
+
+    def update_film(self, **kwargs):
+        """Обновляет данные фильма"""
+
+        self.model.update(**kwargs)
+        self.view.show_message("Фильм обновлен!")
+
+    def show_film(self):
+        """Отображает информацию о фильме"""
+
+        self.view.display_film(self.model)
+
+    def get_film_data(self) -> dict:
+        """Возвращает данные фильма"""
+
+        return self.model.to_dict()
+
+    def add_actor_to_film(self, name: str, role: str):
+        """Добавляет актера в фильм"""
+
+        self.model.add_actor(name, role)
+        self.view.show_message(f"Актер {name} добавлен!")
+
+    def remove_actor_from_film(self, name: str):
+        """Удаляет актера из фильма"""
+
+        self.model.remove_actor(name)
+        self.view.show_message(f"Актер {name} удален!")
