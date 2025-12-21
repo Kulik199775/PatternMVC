@@ -45,3 +45,34 @@ class Article:
                 f"Количество знаков: {self.char_count}\n"
                 f"Издание: {self.publication}\n"
                 f"Описание: {self.description}")
+
+
+# Контроллер
+class ArticleController:
+    """Контроллер для управления статьями"""
+
+    def __init__(self, model: Article, view):
+        self.model = model
+        self.view = view
+
+    def create_article(self, title: str, author: str, char_count: int,
+                       publication: str, description: str):
+        """Создание новой статьи"""
+
+        self.model = Article(title, author, char_count, publication, description)
+        self.view.show_message(f"Статья '{title}' создана!")
+
+    def update_article(self, **kwargs):
+        """Обновление данных статьи"""
+
+        self.model.update(**kwargs)
+        self.view.show_message("Статья обновлена!")
+
+    def show_article(self):
+        """Отображение информации о статье"""
+        self.view.display_article(self.model)
+
+    def get_article_data(self) -> dict:
+        """Возврат данных статьи"""
+
+        return self.model.to_dict()
